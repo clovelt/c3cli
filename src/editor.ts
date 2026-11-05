@@ -18,16 +18,25 @@ export interface Session { context: BrowserContext; page: Page; cdpUrl: string |
 // no leftover addons, recovery prompts or settings between runs.
 // With `cdp`, Chromium also listens on a random local DevTools port so other processes
 // (daemon clients) can drive its pages; the URL is read from DevToolsActivePort.
-export async function launch(opts: { profile?: string; headed: boolean; cdp?: boolean; locale?: string }): Promise<Session> {
+// With `extensions`, those unpacked browser extensions (folders with a manifest.json) are
+// loaded into the browser, so they run on the editor as they would for a user. Playwright
+// launches with --disable-extensions, and its default headless shell can't run them, so
+// that default is dropped and the full Chromium build is used (its new headless mode).
+export async function launch(opts: { profile?: string; headed: boolean; cdp?: boolean; locale?: string; extensions?: string[] }): Promise<Session> {
   const temp = opts.profile ? null : await mkdtemp(path.join(os.tmpdir(), "c3cli-profile-"));
   const userDataDir = opts.profile ?? temp!;
+  const exts = (opts.extensions ?? []).map((p) => path.resolve(p));
   const context = await chromium.launchPersistentContext(userDataDir, {
+    ...(exts.length ? { channel: "chromium", ignoreDefaultArgs: ["--disable-extensions"] } : {}),
     headless: !opts.headed,
     viewport: { width: 1400, height: 900 },
     // A fresh profile takes the editor's language from the browser's; a profile where
     // someone picked a language in C3's settings keeps it.
     locale: opts.locale ?? "en-US",
-    args: opts.cdp ? ["--remote-debugging-port=0", "--remote-debugging-address=127.0.0.1"] : [],
+    args: [
+      ...(opts.cdp ? ["--remote-debugging-port=0", "--remote-debugging-address=127.0.0.1"] : []),
+      ...(exts.length ? [`--disable-extensions-except=${exts.join(",")}`, `--load-extension=${exts.join(",")}`] : []),
+    ],
   });
   await context.addInitScript(BRIDGE_SCRIPT);
   await silenceReleasePrompts(context);

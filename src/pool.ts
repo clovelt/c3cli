@@ -63,6 +63,8 @@ export interface PoolOptions {
   // Log the tabs in with the session `c3cli login` saved (default), unless the profile has a
   // login of its own. False: stay logged out.
   sharedSession?: boolean;
+  // Unpacked browser extensions to load (see launch in editor.ts).
+  extensions?: string[];
 }
 
 export class LocalPool implements TabSource {
@@ -77,7 +79,7 @@ export class LocalPool implements TabSource {
   private constructor(readonly session: Session, private tabs: Tab[], private loadTimeoutMs: number, readonly shared: SharedSession | null) {}
 
   static async launch(opts: PoolOptions): Promise<LocalPool> {
-    const session = await launch({ profile: opts.profile, headed: opts.headed, cdp: opts.cdp, locale: opts.locale });
+    const session = await launch({ profile: opts.profile, headed: opts.headed, cdp: opts.cdp, locale: opts.locale, extensions: opts.extensions });
     const notes: string[] = [];
     let shared: SharedSession | null = null;
     try {

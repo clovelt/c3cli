@@ -30,6 +30,7 @@ interface OpenOpts {
   addons: string[];
   daemon: boolean;
   guest: boolean;
+  extension: string[];
 }
 
 const collect = (v: string, prev: string[]) => [...prev, v];
@@ -51,6 +52,7 @@ function withOpenOptions(cmd: Command): Command {
   .option("--addons <path>", "install these addons first (.c3addon, a folder of them, or a zip; repeatable); they stay in the profile (the daemon's, with the daemon)", collect, [])
   .option("--keep-open", "leave the editor open until the window is closed (implies --headed)", false)
   .option("--guest", "stay logged out: don't use the session saved by `c3cli login`", false)
+  .option("--extension <dir>", "load this unpacked browser extension (a folder with a manifest.json; repeatable); runs in a private browser, never the daemon's", collect, [])
   .option("--no-daemon", "use a private browser even if the daemon is running");
 }
 
@@ -478,12 +480,12 @@ async function runCommand(projectPath: string, opts: OpenOpts, then?: Then): Pro
 // The daemon's warm editor when it's running, unless this run needs its own browser
 // (a specific profile, a visible window, or --no-daemon).
 async function getEditor(opts: OpenOpts): Promise<{ editor: C3Editor; via: "daemon" | "local" }> {
-  const ownBrowser = !opts.daemon || opts.profile || opts.headed || opts.keepOpen || opts.guest;
+  const ownBrowser = !opts.daemon || opts.profile || opts.headed || opts.keepOpen || opts.guest || opts.extension.length > 0;
   if (!ownBrowser) {
     const source = await DaemonSource.connect().catch(() => null);
     if (source) return { editor: C3Editor.fromSource(source), via: "daemon" };
   }
-  return { editor: await C3Editor.launch({ profile: opts.profile, headed: opts.headed || opts.keepOpen, sharedSession: !opts.guest }), via: "local" };
+  return { editor: await C3Editor.launch({ profile: opts.profile, headed: opts.headed || opts.keepOpen, sharedSession: !opts.guest, extensions: opts.extension }), via: "local" };
 }
 
 // --use-project-release: exactly the release the project was saved with, older or newer.

@@ -44,6 +44,9 @@ export interface LaunchOptions {
   // Log in with the session `c3cli login` saved (default true), unless `profile` has a login
   // of its own. False: the editor stays logged out (free edition).
   sharedSession?: boolean;
+  // Unpacked browser extensions (folders with a manifest.json) to load into the browser, to
+  // test an extension that works on the editor.
+  extensions?: string[];
 }
 
 export interface OpenOptions {
@@ -133,7 +136,7 @@ export class C3Editor {
   // A private browser with its own pool of editor tabs.
   static async launch(opts: LaunchOptions = {}): Promise<C3Editor> {
     const warm = opts.warm ? await resolveRelease(opts.warm) : undefined;
-    const pool = await LocalPool.launch({ profile: opts.profile, headed: opts.headed ?? false, tabs: opts.tabs ?? 1, warm, locale: opts.locale, sharedSession: opts.sharedSession });
+    const pool = await LocalPool.launch({ profile: opts.profile, headed: opts.headed ?? false, tabs: opts.tabs ?? 1, warm, locale: opts.locale, sharedSession: opts.sharedSession, extensions: opts.extensions });
     return new C3Editor(pool);
   }
 

@@ -71,6 +71,7 @@ Common options:
 | `--guest` | Stay logged out (by default runs use the login saved by `c3cli login`) |
 | `--no-install-bundled-addons` | Don't install the addons bundled in the project. By default c3cli trusts them before opening, so the editor installs them without asking |
 | `--addons <path>` | Install these addons first (`.c3addon`, a folder of them, a zip) |
+| `--extension <dir>` | Load this unpacked browser extension (a folder with a `manifest.json`; repeatable), to test an extension that works on the editor. Runs in a private browser, never the daemon's |
 
 A project saved with a newer release than the one chosen is refused by the editor. At a
 terminal, c3cli asks whether to switch to the project's release. c3cli never saves a

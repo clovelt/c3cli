@@ -19,6 +19,7 @@ copied. The input is only ever written by `save` without `--to`.
 | `--guest` | logged in | Stay logged out: don't use the session saved by [`c3cli login`](#login-logout-and-whoami). Runs in a private browser even if the daemon is running. |
 | `--no-install-bundled-addons` | installs | Decline the editor's offer to install addons bundled in the project. The open then fails with `missing-addons`, naming them. |
 | `--addons <path>` | | Install these addons first: a `.c3addon`, a folder of them, or a zip. Repeatable. For projects that use addons they don't bundle. They stay in the browser profile: the daemon's when it's used, yours with `--profile`. See [addons install](#addons-install). |
+| `--extension <dir>` | | Load this unpacked browser extension (a folder with a `manifest.json`) into the browser. Repeatable. For testing an extension that works on the editor. Runs in a private browser even if the daemon is running. |
 | `--no-daemon` | uses it | Don't use the [daemon](#daemon) even if it's running |
 
 **Release choice.** When the project was saved with a newer release than the one chosen,

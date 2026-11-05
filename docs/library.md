@@ -25,6 +25,8 @@ const editor = await C3Editor.launch({
                                       // editor takes it, and c3cli works in any of C3's languages
   sharedSession: true,                // log in with the session `c3cli login` saved (default),
                                       // unless `profile` has a login of its own; false: logged out
+  extensions: ["./my-extension"],     // unpacked browser extensions to load (folders with a
+                                      // manifest.json), to test one that works on the editor
 });
 
 // Or borrow tabs from a running daemon (`c3cli daemon start`). Throws if it isn't running.
